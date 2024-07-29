@@ -92,12 +92,12 @@ public class Category_Repository {
 //********************************Begin of Display Methods********************************
     public DefaultTableModel showCategories(String search, String stateFilter) {
         DefaultTableModel model;
-        String[] titles = {"Codigo", "Categoría", "Descripción", "Estado"};
-        String[] records = new String[4];
+        String[] titles = {"Id", "Codigo", "Categoría", "Descripción", "Estado"};
+        String[] records = new String[5];
         int totalRecords = 0;
         model = new DefaultTableModel(null, titles);
 
-        String sSQL = "SELECT c.codigo, c.categorias, c.descripcion, e.estados "
+        String sSQL = "SELECT c.idcategorias, c.codigo, c.categorias, c.descripcion, e.estados "
                     + "FROM categorias c "
                     + "JOIN estados e ON c.fk_estados = e.idestados "
                     + "WHERE c.categorias LIKE ?";
@@ -117,10 +117,11 @@ public class Category_Repository {
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
-                records[0] = rs.getString("codigo");
-                records[1] = rs.getString("categorias");
-                records[2] = rs.getString("descripcion");
-                records[3] = rs.getString("estados");
+                records[0] = rs.getString("idcategorias");
+                records[1] = rs.getString("codigo");
+                records[2] = rs.getString("categorias");
+                records[3] = rs.getString("descripcion");
+                records[4] = rs.getString("estados");
                 
                 totalRecords++;
                 model.addRow(records);

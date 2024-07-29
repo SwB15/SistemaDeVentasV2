@@ -17,12 +17,12 @@ public class Subsubcategory_Services {
     public Subsubcategory_Services() {
     }
 
-    public boolean addSubsubcategory(Subsubcategory_Model model, int foreignKey) {
-        return subsubcategory_repository.insert(model, foreignKey);
+    public boolean addSubsubcategory(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+        return subsubcategory_repository.insert(model, foreignKey, foreignKey2);
     }
 
-    public boolean updateSubsubcategory(Subsubcategory_Model model, int foreignKey) {
-        return subsubcategory_repository.update(model, foreignKey);
+    public boolean updateSubsubcategory(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+        return subsubcategory_repository.update(model, foreignKey, foreignKey2);
     }
 
     public boolean deleteSubsubcategory(Subsubcategory_Model model) {

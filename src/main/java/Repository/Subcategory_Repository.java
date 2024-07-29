@@ -97,12 +97,12 @@ public class Subcategory_Repository {
 //********************************Begin of Display Methods********************************
     public DefaultTableModel showSubcategories(String search, String stateFilter) {
         DefaultTableModel model;
-        String[] titles = {"Codigo", "Subcategoría", "Descripción", "Categoría", "Estado"};
-        String[] records = new String[5];
+        String[] titles = {"Id","Codigo", "Subcategoría", "Descripción", "Categoría", "Estado"};
+        String[] records = new String[6];
         int totalRecords = 0;
         model = new DefaultTableModel(null, titles);
 
-        String sSQL = "SELECT s.codigo, s.subcategorias, s.descripcion, c.categorias, e.estados "
+        String sSQL = "SELECT s.idsubcategorias, s.codigo, s.subcategorias, s.descripcion, c.categorias, e.estados "
                 + "FROM subcategorias s "
                 + "JOIN categorias c ON s.fk_categorias = c.idcategorias "
                 + "JOIN estados e ON s.fk_estados = e.idestados "
@@ -122,11 +122,12 @@ public class Subcategory_Repository {
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
-                records[0] = rs.getString("codigo");
-                records[1] = rs.getString("subcategorias");
-                records[2] = rs.getString("descripcion");
-                records[3] = rs.getString("categorias");
-                records[4] = rs.getString("estados");
+                records[0] = rs.getString("idsubcategorias");
+                records[1] = rs.getString("codigo");
+                records[2] = rs.getString("subcategorias");
+                records[3] = rs.getString("descripcion");
+                records[4] = rs.getString("categorias");
+                records[5] = rs.getString("estados");
 
                 totalRecords++;
                 model.addRow(records);

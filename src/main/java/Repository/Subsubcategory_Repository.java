@@ -25,14 +25,15 @@ public class Subsubcategory_Repository {
     PreparedStatement pst = null;
 
 //******************************** Begin of Insert, Update, Delete, Disable ********************************
-    public boolean insert(Subsubcategory_Model model, int foreignKey) {
-        sql = "INSERT INTO subsubcategorias(codigo, subsubcategorias, descripcion, fk_subcategorias) VALUES(?,?,?,?)";
+    public boolean insert(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+        sql = "INSERT INTO subsubcategorias(codigo, subsubcategorias, descripcion, fk_subcategorias, fk_estados) VALUES(?,?,?,?,?)";
         try (Connection cn = DataSource.getConnection()) {
             pst = cn.prepareStatement(sql);
             pst.setString(1, model.getCodigo());
             pst.setString(2, model.getSubsubcategorias());
             pst.setString(3, model.getDescripcion());
             pst.setInt(4, foreignKey);
+            pst.setInt(5, foreignKey2);
 
             int N = pst.executeUpdate();
             return N != 0;
@@ -42,15 +43,16 @@ public class Subsubcategory_Repository {
         }
     }
 
-    public boolean update(Subsubcategory_Model model, int foreignKey) {
-        sql = "UPDATE subsubcategorias SET codigo = ?, subsubcategorias = ?, descripcion = ?, fk_subcategorias WHERE idsubsubcategorias = ?";
+    public boolean update(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+        sql = "UPDATE subsubcategorias SET codigo = ?, subsubcategorias = ?, descripcion = ?, fk_subcategorias, fk_estados WHERE idsubsubcategorias = ?";
         try (Connection cn = DataSource.getConnection()) {
             pst = cn.prepareStatement(sql);
             pst.setString(1, model.getCodigo());
             pst.setString(2, model.getSubsubcategorias());
             pst.setString(3, model.getDescripcion());
             pst.setInt(4, foreignKey);
-            pst.setInt(5, model.getIdsubsubcategorias());
+            pst.setInt(5, foreignKey2);
+            pst.setInt(6, model.getIdsubsubcategorias());
 
             int N = pst.executeUpdate();
             return N != 0;
@@ -95,12 +97,12 @@ public class Subsubcategory_Repository {
 //********************************Begin of Display Methods********************************
     public DefaultTableModel showSubsubcategories(String search, String stateFilter) {
         DefaultTableModel model;
-        String[] titles = {"Codigo", "Subsubcategoría", "Subcategoría", "Categoría", "Descripción", "Estado"};
-        String[] records = new String[6];
+        String[] titles = {"Id", "Codigo", "Sub-subcategoría", "Descripción", "Subcategoría", "Categoría", "Estado"};
+        String[] records = new String[7];
         int totalRecords = 0;
         model = new DefaultTableModel(null, titles);
 
-        String sSQL = "SELECT ss.codigo, ss.subsubcategorias, s.subcategorias, c.categorias, ss.descripcion, e.estados "
+        String sSQL = "SELECT ss.idsubsubcategorias, ss.codigo, ss.subsubcategorias, ss.descripcion, s.subcategorias, c.categorias, e.estados "
                 + "FROM subsubcategorias ss "
                 + "JOIN subcategorias s ON ss.fk_subcategorias = s.idsubcategorias "
                 + "JOIN categorias c ON s.fk_categorias = c.idcategorias "
@@ -121,12 +123,13 @@ public class Subsubcategory_Repository {
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
-                records[0] = rs.getString("codigo");
-                records[1] = rs.getString("subsubcategorias");
-                records[2] = rs.getString("subcategorias");
-                records[3] = rs.getString("categorias");
-                records[4] = rs.getString("descripcion");
-                records[5] = rs.getString("estados");
+                records[0] = rs.getString("idsubsubcategorias");
+                records[1] = rs.getString("codigo");
+                records[2] = rs.getString("subsubcategorias");
+                records[3] = rs.getString("descripcion");
+                records[4] = rs.getString("subcategorias");
+                records[5] = rs.getString("categorias");
+                records[6] = rs.getString("estados");
 
                 totalRecords++;
                 model.addRow(records);
@@ -137,7 +140,7 @@ public class Subsubcategory_Repository {
             return null;
         }
     }
-    
+
     public HashMap<String, List<String>> fillSubcategoryCombobox(int foreignKey) {
         HashMap<String, List<String>> subcategoryMap = new HashMap<>();
         String sSQL = "SELECT idsubcategorias, codigo, subcategorias FROM subcategorias WHERE fk_categorias = ?";

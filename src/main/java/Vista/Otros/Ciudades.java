@@ -187,11 +187,6 @@ public final class Ciudades extends javax.swing.JInternalFrame {
                 tblCiudadesMouseClicked(evt);
             }
         });
-        tblCiudades.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tblCiudadesKeyPressed(evt);
-            }
-        });
         jScrollPane1.setViewportView(tblCiudades);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 610, 170));
@@ -334,10 +329,6 @@ public final class Ciudades extends javax.swing.JInternalFrame {
             advertencia();
         }
     }//GEN-LAST:event_txtCiudadesKeyTyped
-
-    private void tblCiudadesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblCiudadesKeyPressed
-
-    }//GEN-LAST:event_tblCiudadesKeyPressed
 
     private void lblCerrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCerrarMouseClicked
         Principal3.lblProceso.setText("Proceso: OFF");
