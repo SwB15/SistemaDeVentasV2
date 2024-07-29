@@ -13,7 +13,6 @@ import Vista.CompraVenta.Ventas1;
 import Vista.Descuentos.Descuentos;
 import Vista.Notificaciones.*;
 import Vista.Otros.AcercaDe;
-import Vista.Otros.Auditoria;
 import Vista.Otros.Ciudades;
 import Vista.Otros.Departamentos;
 import Vista.Personas.Clientes;
@@ -21,23 +20,18 @@ import Vista.Personas.Usuarios;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import Vista.Otros.Backup;
 import Vista.Otros.CodeBar;
 import Vista.Personas.Funcionarios;
 import View.Products.Baja;
 import View.Products.ProductList;
-import View.Products.Productos;
 import View.Products.Sorter;
 import Vista.Proveedores.Proveedores;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Frame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -158,7 +152,7 @@ public final class Principal extends javax.swing.JFrame {
         });
         pnlNotificaciones.add(lblContadorNotificaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(34, 4, 24, 24));
 
-        lblNotificaciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/pruebanotificaciones.png"))); // NOI18N
+        lblNotificaciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pruebanotificaciones.png"))); // NOI18N
         lblNotificaciones.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblNotificacionesMouseClicked(evt);
@@ -191,7 +185,7 @@ public final class Principal extends javax.swing.JFrame {
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 314, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 282, Short.MAX_VALUE)
                 .addComponent(txtAceptarCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(pnlNotificaciones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -206,7 +200,6 @@ public final class Principal extends javax.swing.JFrame {
         });
 
         smnuCategorias.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        smnuCategorias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Categoria20.png"))); // NOI18N
         smnuCategorias.setText("Categorias");
         smnuCategorias.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,7 +209,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuProductos.add(smnuCategorias);
 
         smnuProductos.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        smnuProductos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Productos20.png"))); // NOI18N
         smnuProductos.setText("Agregar Producto");
         smnuProductos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -226,7 +218,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuProductos.add(smnuProductos);
 
         smnuListaProductos.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        smnuListaProductos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Lista20.png"))); // NOI18N
         smnuListaProductos.setText("Lista Productos");
         smnuListaProductos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -271,7 +262,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuPersonas.setText("Personas");
 
         smnuUsuarios.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuUsuarios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Usuario2-20.png"))); // NOI18N
         smnuUsuarios.setText("Usuarios");
         smnuUsuarios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -281,7 +271,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuPersonas.add(smnuUsuarios);
 
         smnuClientes.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuClientes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Cliente20.png"))); // NOI18N
         smnuClientes.setText("Clientes");
         smnuClientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -303,7 +292,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuCompras.setText("Compras");
 
         smnuCompras.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuCompras.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/NuevaVenta20.png"))); // NOI18N
         smnuCompras.setText("Nueva Compra");
         smnuCompras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -313,7 +301,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuCompras.add(smnuCompras);
 
         smnuListaCompras.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuListaCompras.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Lista20.png"))); // NOI18N
         smnuListaCompras.setText("Lista Compras");
         smnuListaCompras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -327,7 +314,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuCaja.setText("Caja");
 
         smnuAbrirCaja.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuAbrirCaja.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Caja Registradora2-20.png"))); // NOI18N
         smnuAbrirCaja.setText("Abrir Caja");
         smnuAbrirCaja.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -337,7 +323,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuCaja.add(smnuAbrirCaja);
 
         smnuCerrarCaja.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuCerrarCaja.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Caja Registradora2-20.png"))); // NOI18N
         smnuCerrarCaja.setText("Cerrar Caja");
         smnuCerrarCaja.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -347,7 +332,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuCaja.add(smnuCerrarCaja);
 
         smnuMovimientos.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuMovimientos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Caja Registradora20.png"))); // NOI18N
         smnuMovimientos.setText("Movimientos");
         smnuMovimientos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -369,7 +353,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuVentas.setText("Ventas");
 
         smnuVentas.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuVentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Ventas2-20.png"))); // NOI18N
         smnuVentas.setText("Nueva Venta");
         smnuVentas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -379,7 +362,6 @@ public final class Principal extends javax.swing.JFrame {
         mnuVentas.add(smnuVentas);
 
         smnuListaVentas.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        smnuListaVentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Lista20.png"))); // NOI18N
         smnuListaVentas.setText("Lista Ventas");
         smnuListaVentas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

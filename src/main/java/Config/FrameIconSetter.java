@@ -11,7 +11,7 @@ import javax.swing.JInternalFrame;
  */
 public class FrameIconSetter {
 
-    private final ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/icono.png"));
+    private final ImageIcon icon = new ImageIcon(getClass().getResource("/img/icono.png"));
 
     public FrameIconSetter() {
     

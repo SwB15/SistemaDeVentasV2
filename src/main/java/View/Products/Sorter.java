@@ -5,7 +5,16 @@ import Config.Run;
 import Controller.Category_Controller;
 import Model.Category_Model;
 import Controller.State_Controller;
-import Services.Category_Services;
+import Controller.Subcategory_Controller;
+import Controller.Subsubcategory_Controller;
+import Model.Subcategory_Model;
+import Model.Subsubcategory_Model;
+import Repository.Subcategory_Repository;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -17,10 +26,18 @@ import javax.swing.table.DefaultTableModel;
  */
 public final class Sorter extends javax.swing.JDialog {
 
-    Category_Controller controller = new Category_Controller();
+    Category_Controller category_controller = new Category_Controller();
+    Subcategory_Controller subcategory_controller = new Subcategory_Controller();
+    Subsubcategory_Controller subsubcategory_controller = new Subsubcategory_Controller();
     Category_Model category_model = new Category_Model();
-    private String code = "", estado = "", stateFilter = "activo";
+    Subcategory_Model subcategory_model = new Subcategory_Model();
+    Subsubcategory_Model subsubcategory_model = new Subsubcategory_Model();
+    Subcategory_Repository subcategory_repository = new Subcategory_Repository();
+
+    private String code = "", estado = "", stateFilter = "activo", tabSelected = "";
     private int idestado;
+    private HashMap<String, List<String>> categoryMap;
+
 
     public Sorter(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -29,18 +46,27 @@ public final class Sorter extends javax.swing.JDialog {
         jTabbedPane1.setUI(new CustomTabbedPaneUI());
         showCategories("", stateFilter);
         rbtnCategoryActive.setSelected(true);
-        jTabbedPane1.addChangeListener(new ChangeListener() {
+        jTabbedPane1.addChangeListener((ChangeEvent e) -> {
+            onTabChange();
+        });
+        chbCategoryActive.addActionListener(new ActionListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
-                onTabChange();
+            public void actionPerformed(ActionEvent e) {
+                boolean isSelected = chbCategoryActive.isSelected();
+                if (isSelected) {
+                    stateFilter = "activo";
+                } else {
+                    stateFilter = "inactivo";
+                }
             }
         });
+        subCategoryCombobox();
     }
 
-    public void showCategories(String search, String stateFilter) {
+    private void showCategories(String search, String stateFilter) {
         try {
             DefaultTableModel model;
-            model = controller.showCategories(search, stateFilter);
+            model = category_controller.showCategories(search, stateFilter);
             tblCategory.setModel(model);
 //            ocultar_columnas();
         } catch (Exception e) {
@@ -48,10 +74,69 @@ public final class Sorter extends javax.swing.JDialog {
         }
     }
 
-    public void ocultar_columnas() {
-        tblCategory.getColumnModel().getColumn(0).setMaxWidth(0);
-        tblCategory.getColumnModel().getColumn(0).setMinWidth(0);
-        tblCategory.getColumnModel().getColumn(0).setPreferredWidth(0);
+    private void showSubcategories(String search, String stateFilter) {
+        try {
+            DefaultTableModel model;
+            model = subcategory_controller.showSubcategories(search, stateFilter);
+            tblSubcategory.setModel(model);
+//            ocultar_columnas();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void showSubsubcategories(String search, String stateFilter) {
+        try {
+            DefaultTableModel model;
+            model = subsubcategory_controller.showSubsubcategories(search, stateFilter);
+            tblSubsubcategory.setModel(model);
+//            ocultar_columnas();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void subCategoryCombobox() {
+        // Obtener el HashMap de categorías
+        categoryMap = subcategory_repository.fillCategoryCombos();
+        cmbCategoryName.removeAllItems();
+        cmbCategoryCode.removeAllItems();
+        cmbCategoryName.addItem("--Seleccione--");
+        cmbCategoryCode.addItem("--Seleccione--");
+
+        // Llenar el combobox de nombres de categoría
+        for (String name : categoryMap.keySet()) {
+            cmbCategoryName.addItem(name);
+        }
+
+        // Llenar el combobox de códigos de categoría
+        for (List<String> values : categoryMap.values()) {
+            cmbCategoryCode.addItem(values.get(0)); // Asumiendo que el código está en la primera posición de la lista
+        }
+
+        // Agregar ActionListener para cmbCategoryName
+        cmbCategoryName.addActionListener((ActionEvent e) -> {
+            String selectedName = (String) cmbCategoryName.getSelectedItem();
+            if (selectedName != null) {
+                List<String> correspondingValues = categoryMap.get(selectedName);
+                if (correspondingValues != null) {
+                    cmbCategoryCode.setSelectedItem(correspondingValues.get(0)); // Asumiendo que el código está en la primera posición de la lista
+                }
+            }
+        });
+
+        // Agregar ActionListener para cmbCategoryCode
+        cmbCategoryCode.addActionListener((ActionEvent e) -> {
+            String selectedCode = (String) cmbCategoryCode.getSelectedItem();
+            if (selectedCode != null) {
+                for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                    if (entry.getValue().get(0).equals(selectedCode)) { // Asumiendo que el código está en la primera posición de la lista
+                        cmbCategoryName.setSelectedItem(entry.getKey());
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void onTabChange() {
@@ -61,37 +146,73 @@ public final class Sorter extends javax.swing.JDialog {
                 // Categories tab selected
                 rbtnCategoryActive.setSelected(true);
                 stateFilter = "activo";
+                tabSelected = "category";
                 showCategories("", stateFilter);
                 break;
             case 1:
                 // Subcategories tab selected
                 rbtnSubcategoryActive.setSelected(true);
                 stateFilter = "activo";
-//                showSubcategories("", stateFilter);
+                tabSelected = "subcategory";
+                showSubcategories("", stateFilter);
                 break;
             case 2:
                 // Sub-subcategories tab selected
                 rbtnSubsubcategoryActive.setSelected(true);
                 stateFilter = "activo";
-//                showSubsubcategories("", stateFilter);
+                tabSelected = "subsubcategory";
+                showSubsubcategories("", stateFilter);
                 break;
         }
     }
 
     private void save() {
-        if (validateFields()) {
+        if (tabSelected.equals("category")) {
+            if (validateFields()) {
+                estado = "activo";
+                idestado = State_Controller.getEstadoId(estado, Run.model);
+
+                category_model.setCodigo(txtCategoryCode.getText());
+                category_model.setCategorias(txtCategoryName.getText());
+                category_model.setDescripcion(txtCategoryDescription.getText());
+                category_controller.createCategory(category_model, idestado);
+
+                showCategories("", stateFilter);
+                JOptionPane.showMessageDialog(null, "Categoria guardada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al guardar la categoria", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (tabSelected.equals("subcategory") && validateFields()) {
             estado = "activo";
             idestado = State_Controller.getEstadoId(estado, Run.model);
 
-            category_model.setCodigo(txtCategoryCode.getText());
-            category_model.setCategorias(txtCategoryName.getText());
-            category_model.setDescripcion(txtCategoryDescription.getText());
-            controller.createCategory(category_model, idestado);
+            String selectedName = (String) cmbCategoryName.getSelectedItem();
+            String selectedCode = (String) cmbCategoryCode.getSelectedItem();
+            int categoryId = -1; // Valor por defecto en caso de que no se encuentre el ID
 
-            showCategories("", stateFilter);
-            JOptionPane.showMessageDialog(null, "Categoria guardada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+            if (selectedName != null && categoryMap.containsKey(selectedName)) {
+                List<String> selectedCategoryValues = categoryMap.get(selectedName);
+                categoryId = selectedCategoryValues != null ? Integer.parseInt(selectedCategoryValues.get(1)) : -1;
+            } else if (selectedCode != null) {
+                for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                    if (entry.getValue().get(0).equals(selectedCode)) {
+                        categoryId = Integer.parseInt(entry.getValue().get(1));
+                        break;
+                    }
+                }
+            }
+
+            subcategory_model.setCodigo(txtSubcategoryCode.getText());
+            subcategory_model.setSubcategorias(txtSubcategoryName.getText());
+            subcategory_model.setDescripcion(txtSubcategoryDescription.getText());
+            subcategory_controller.createSubcategory(subcategory_model, categoryId, idestado);
+
+            showSubcategories("", stateFilter);
+            JOptionPane.showMessageDialog(null, "Subcategoria guardada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(null, "Error al guardar la categoria", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error al guardar la subcategoria", "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -104,7 +225,7 @@ public final class Sorter extends javax.swing.JDialog {
             category_model.setCodigo(txtCategoryCode.getText());
             category_model.setCategorias(txtCategoryName.getText());
             category_model.setDescripcion(txtCategoryDescription.getText());
-            controller.updateCategory(category_model, idestado);
+            category_controller.updateCategory(category_model, idestado);
 
             showCategories("", stateFilter);
             JOptionPane.showMessageDialog(null, "Categoria editada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
@@ -123,7 +244,7 @@ public final class Sorter extends javax.swing.JDialog {
                 idestado = State_Controller.getEstadoId(estado, Run.model);
 
                 category_model.setIdcategorias(Integer.parseInt(code));
-                controller.disableCategory(category_model, idestado);
+                category_controller.disableCategory(category_model, idestado);
                 JOptionPane.showMessageDialog(null, "Categoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -156,6 +277,7 @@ public final class Sorter extends javax.swing.JDialog {
         rbtnCategoryAll = new javax.swing.JRadioButton();
         jLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        chbCategoryActive = new javax.swing.JCheckBox();
         pnlSubcategory = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         txtSubcategoryName = new javax.swing.JTextField();
@@ -175,6 +297,7 @@ public final class Sorter extends javax.swing.JDialog {
         rbtnSubcategoryAll = new javax.swing.JRadioButton();
         jLabel16 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
+        chbSubcategoryActive = new javax.swing.JCheckBox();
         pnlSubsubcategory = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         txtSubsubcategoryName = new javax.swing.JTextField();
@@ -197,6 +320,7 @@ public final class Sorter extends javax.swing.JDialog {
         cmbSubCategoryCode = new javax.swing.JComboBox<>();
         cmbSubCategoryName = new javax.swing.JComboBox<>();
         jSeparator2 = new javax.swing.JSeparator();
+        chbSubsubCategoryActive = new javax.swing.JCheckBox();
         btnCancel = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         btnNew = new javax.swing.JButton();
@@ -308,6 +432,9 @@ public final class Sorter extends javax.swing.JDialog {
                     .addComponent(rbtnCategoryAll)))
         );
 
+        chbCategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        chbCategoryActive.setText("Activo");
+
         javax.swing.GroupLayout pnlCategoryLayout = new javax.swing.GroupLayout(pnlCategory);
         pnlCategory.setLayout(pnlCategoryLayout);
         pnlCategoryLayout.setHorizontalGroup(
@@ -326,8 +453,12 @@ public final class Sorter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
             .addGroup(pnlCategoryLayout.createSequentialGroup()
-                .addComponent(jSeparator1)
-                .addGap(0, 0, 0)
+                .addGroup(pnlCategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCategoryLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(chbCategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(pnlCategoryRadiobuttons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlCategoryLayout.setVerticalGroup(
@@ -353,7 +484,10 @@ public final class Sorter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlCategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlCategoryRadiobuttons, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCategoryLayout.createSequentialGroup()
+                        .addComponent(chbCategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -361,6 +495,12 @@ public final class Sorter extends javax.swing.JDialog {
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel3.setText("Categoria:");
+
+        txtSubcategoryName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubcategoryNameKeyTyped(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setText("Nombre:");
@@ -373,10 +513,21 @@ public final class Sorter extends javax.swing.JDialog {
 
         txtSubcategoryDescription.setColumns(20);
         txtSubcategoryDescription.setRows(5);
+        txtSubcategoryDescription.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubcategoryDescriptionKeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(txtSubcategoryDescription);
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setText("Codigo:");
+
+        txtSubcategoryCode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubcategoryCodeKeyTyped(evt);
+            }
+        });
 
         cmbCategoryName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cmbCategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -435,6 +586,9 @@ public final class Sorter extends javax.swing.JDialog {
                     .addComponent(rbtnSubcategoryAll)))
         );
 
+        chbSubcategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        chbSubcategoryActive.setText("Activo");
+
         javax.swing.GroupLayout pnlSubcategoryLayout = new javax.swing.GroupLayout(pnlSubcategory);
         pnlSubcategory.setLayout(pnlSubcategoryLayout);
         pnlSubcategoryLayout.setHorizontalGroup(
@@ -458,9 +612,14 @@ public final class Sorter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
             .addGroup(pnlSubcategoryLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSeparator3)
-                .addGap(0, 0, 0)
+                .addGroup(pnlSubcategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSubcategoryLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSeparator3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSubcategoryLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(chbSubcategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlSubcategoryLayout.setVerticalGroup(
@@ -491,7 +650,10 @@ public final class Sorter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlSubcategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSubcategoryLayout.createSequentialGroup()
+                        .addComponent(chbSubcategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -499,6 +661,12 @@ public final class Sorter extends javax.swing.JDialog {
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel4.setText("Categoria:");
+
+        txtSubsubcategoryName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubsubcategoryNameKeyTyped(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel11.setText("Nombre:");
@@ -511,10 +679,21 @@ public final class Sorter extends javax.swing.JDialog {
 
         txtSubsubcategoryDescription.setColumns(20);
         txtSubsubcategoryDescription.setRows(5);
+        txtSubsubcategoryDescription.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubsubcategoryDescriptionKeyTyped(evt);
+            }
+        });
         jScrollPane3.setViewportView(txtSubsubcategoryDescription);
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel13.setText("Codigo:");
+
+        txtSubsubcategoryCode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSubsubcategoryCodeKeyTyped(evt);
+            }
+        });
 
         cmbCategoryName1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cmbCategoryName1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -582,6 +761,9 @@ public final class Sorter extends javax.swing.JDialog {
         cmbSubCategoryName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cmbSubCategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        chbSubsubCategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        chbSubsubCategoryActive.setText("Activo");
+
         javax.swing.GroupLayout pnlSubsubcategoryLayout = new javax.swing.GroupLayout(pnlSubsubcategory);
         pnlSubsubcategory.setLayout(pnlSubsubcategoryLayout);
         pnlSubsubcategoryLayout.setHorizontalGroup(
@@ -611,8 +793,12 @@ public final class Sorter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSubsubcategoryLayout.createSequentialGroup()
-                .addComponent(jSeparator2)
-                .addGap(0, 0, 0)
+                .addGroup(pnlSubsubcategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSubsubcategoryLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(chbSubsubCategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlSubsubcategoryLayout.setVerticalGroup(
@@ -643,12 +829,12 @@ public final class Sorter extends javax.swing.JDialog {
                         .addGroup(pnlSubsubcategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel12)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlSubsubcategoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlSubsubcategoryLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSubsubcategoryLayout.createSequentialGroup()
-                        .addGap(47, 47, 47)
+                        .addComponent(chbSubsubCategoryActive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -797,17 +983,172 @@ public final class Sorter extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_txtCategoryDescriptionKeyTyped
 
+    private void txtSubcategoryCodeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubcategoryCodeKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 3;
+        if (txtSubcategoryCode.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 4 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubcategoryCodeKeyTyped
+
+    private void txtSubcategoryNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubcategoryNameKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 69;
+        if (txtSubcategoryName.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 70 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubcategoryNameKeyTyped
+
+    private void txtSubcategoryDescriptionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubcategoryDescriptionKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 1999;
+        if (txtSubcategoryDescription.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 2.000 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubcategoryDescriptionKeyTyped
+
+    private void txtSubsubcategoryDescriptionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubsubcategoryDescriptionKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 1999;
+        if (txtSubsubcategoryDescription.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 2.000 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubsubcategoryDescriptionKeyTyped
+
+    private void txtSubsubcategoryCodeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubsubcategoryCodeKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 3;
+        if (txtSubsubcategoryCode.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 4 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubsubcategoryCodeKeyTyped
+
+    private void txtSubsubcategoryNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSubsubcategoryNameKeyTyped
+        char c = evt.getKeyChar();
+        if (Character.isLowerCase(c)) {
+            evt.setKeyChar(Character.toUpperCase(c));
+        }
+
+        char validar = evt.getKeyChar();
+
+//        if (Character.isDigit(validar)) {
+//            getToolkit().beep();
+//            evt.consume();
+//            mensaje = "Ingrese solo letras";
+//            advertencia();
+//        }
+        int numerocaracteres = 69;
+        if (txtSubsubcategoryName.getText().length() > numerocaracteres) {
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingrese solo 70 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_txtSubsubcategoryNameKeyTyped
+
     private boolean validateFields() {
-        if (txtCategoryCode.getText().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Ingrese el código de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
-            return false;
+        if (tabSelected.equals("category")) {
+            if (txtCategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtCategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
         }
 
-        if (txtCategoryName.getText().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
-            return false;
+        if (tabSelected.equals("subcategory")) {
+            if (cmbCategoryName.getSelectedItem() == "--Seleccione--") {
+                JOptionPane.showMessageDialog(null, "Seleccione una categoria del combobox", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+            }
+
+            if (txtSubcategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtSubcategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
         }
 
+        if (tabSelected.equals("subsubcategory")) {
+            if (txtCategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtCategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+        }
         return true;
     }
 
@@ -821,6 +1162,9 @@ public final class Sorter extends javax.swing.JDialog {
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSave;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox chbCategoryActive;
+    private javax.swing.JCheckBox chbSubcategoryActive;
+    private javax.swing.JCheckBox chbSubsubCategoryActive;
     private javax.swing.JComboBox<String> cmbCategoryCode;
     private javax.swing.JComboBox<String> cmbCategoryCode1;
     private javax.swing.JComboBox<String> cmbCategoryName;

@@ -26,11 +26,12 @@ public class Category_Services {
     public boolean deleteCategory(Category_Model model) {
         return category_repository.delete(model);
     }
+    
     public boolean disableCategory(Category_Model model, int foreignKey) {
         return category_repository.disable(model, foreignKey);
     }
     
     public DefaultTableModel showCategories(String search, String stateFilter){
-        return category_repository.mostrarCategorias(search, stateFilter);
+        return category_repository.showCategories(search, stateFilter);
     }
 }

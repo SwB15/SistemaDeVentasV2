@@ -45,7 +45,7 @@ public class Subcategory_Model {
         return subcategorias;
     }
 
-    public void setSubcategoria(String subcategorias) {
+    public void setSubcategorias(String subcategorias) {
         this.subcategorias = subcategorias;
     }
 

@@ -90,21 +90,21 @@ public class Category_Repository {
 //******************************** End of Insert, Update, Delete, Disable ********************************
 
 //********************************Begin of Display Methods********************************
-    public DefaultTableModel mostrarCategorias(String buscar, String filtroEstado) {
-        DefaultTableModel modelo;
-        String[] titulos = {"Codigo", "Categoría", "Descripción", "Estado"};
-        String[] registros = new String[4];
-        int totalRegistros = 0;
-        modelo = new DefaultTableModel(null, titulos);
+    public DefaultTableModel showCategories(String search, String stateFilter) {
+        DefaultTableModel model;
+        String[] titles = {"Codigo", "Categoría", "Descripción", "Estado"};
+        String[] records = new String[4];
+        int totalRecords = 0;
+        model = new DefaultTableModel(null, titles);
 
         String sSQL = "SELECT c.codigo, c.categorias, c.descripcion, e.estados "
                     + "FROM categorias c "
                     + "JOIN estados e ON c.fk_estados = e.idestados "
                     + "WHERE c.categorias LIKE ?";
 
-        if (filtroEstado.equals("activo")) {
+        if (stateFilter.equals("activo")) {
             sSQL += " AND e.estados = 'activo'";
-        } else if (filtroEstado.equals("inactivo")) {
+        } else if (stateFilter.equals("inactivo")) {
             sSQL += " AND e.estados = 'inactivo'";
         }
 
@@ -112,20 +112,20 @@ public class Category_Repository {
 
         try (Connection cn = DataSource.getConnection();
              PreparedStatement pst = cn.prepareStatement(sSQL)) { //Don't touch!
-            pst.setString(1, "%" + buscar + "%");
+            pst.setString(1, "%" + search + "%");
 
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
-                registros[0] = rs.getString("codigo");
-                registros[1] = rs.getString("categorias");
-                registros[2] = rs.getString("descripcion");
-                registros[3] = rs.getString("estados");
+                records[0] = rs.getString("codigo");
+                records[1] = rs.getString("categorias");
+                records[2] = rs.getString("descripcion");
+                records[3] = rs.getString("estados");
                 
-                totalRegistros++;
-                modelo.addRow(registros);
+                totalRecords++;
+                model.addRow(records);
             }
-            return modelo;
+            return model;
         } catch (SQLException e) {
             JOptionPane.showConfirmDialog(null, e);
             return null;
