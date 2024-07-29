@@ -138,13 +138,14 @@ public class Subsubcategory_Repository {
         }
     }
     
-    public HashMap<String, List<String>> fillSubcategoryCombos() {
+    public HashMap<String, List<String>> fillSubcategoryCombobox(int foreignKey) {
         HashMap<String, List<String>> subcategoryMap = new HashMap<>();
-        String sSQL = "SELECT idsubcategorias, codigo, subcategorias FROM subcategorias";
+        String sSQL = "SELECT idsubcategorias, codigo, subcategorias FROM subcategorias WHERE fk_categorias = ?";
 
         try (Connection cn = DataSource.getConnection()) {
-            Statement st = cn.createStatement();
-            ResultSet rs = st.executeQuery(sSQL);
+            PreparedStatement pst = cn.prepareStatement(sSQL);
+            pst.setInt(1, foreignKey);
+            ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("idsubcategorias");

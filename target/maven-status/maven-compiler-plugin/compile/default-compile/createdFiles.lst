@@ -235,6 +235,7 @@ View\Products\Productos2$15.class
 View\Categorias$10.class
 View\Products\ListaProductos$3.class
 View\Principal$1.class
+View\Products\Sorter$15.class
 View\Products\Baja$7.class
 View\Products\Productos2.class
 Vista\Descuentos\SeleccionarDescuentos$10.class
@@ -270,6 +271,7 @@ View\Products\Baja$5.class
 Vista\Otros\Backup$5.class
 Vista\Otros\Ciudades$12.class
 Vista\Otros\Departamentos$16.class
+View\Products\Sorter$16.class
 View\Products\Baja$8.class
 View\Products\Sorter$13.class
 Vista\Otros\Departamentos$6.class

@@ -9,7 +9,6 @@ import Controller.Subcategory_Controller;
 import Controller.Subsubcategory_Controller;
 import Model.Subcategory_Model;
 import Model.Subsubcategory_Model;
-import Repository.Subcategory_Repository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -32,12 +30,11 @@ public final class Sorter extends javax.swing.JDialog {
     Category_Model category_model = new Category_Model();
     Subcategory_Model subcategory_model = new Subcategory_Model();
     Subsubcategory_Model subsubcategory_model = new Subsubcategory_Model();
-    Subcategory_Repository subcategory_repository = new Subcategory_Repository();
 
-    private String code = "", estado = "", stateFilter = "activo", tabSelected = "";
+    private final String code = "";
+    private String estado = "", stateFilter = "activo", tabSelected = "";
     private int idestado;
-    private HashMap<String, List<String>> categoryMap;
-
+    private HashMap<String, List<String>> categoryMap, subcategoryMap;
 
     public Sorter(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -61,6 +58,7 @@ public final class Sorter extends javax.swing.JDialog {
             }
         });
         subCategoryCombobox();
+        subsubCategoryCombobox();
     }
 
     private void showCategories(String search, String stateFilter) {
@@ -96,25 +94,22 @@ public final class Sorter extends javax.swing.JDialog {
         }
     }
 
+    //Fill the comboboxes of categories in the subcategories tab
     private void subCategoryCombobox() {
-        // Obtener el HashMap de categorías
-        categoryMap = subcategory_repository.fillCategoryCombos();
+        categoryMap = subcategory_controller.fillCategoryCombobox();
         cmbCategoryName.removeAllItems();
         cmbCategoryCode.removeAllItems();
         cmbCategoryName.addItem("--Seleccione--");
         cmbCategoryCode.addItem("--Seleccione--");
 
-        // Llenar el combobox de nombres de categoría
         for (String name : categoryMap.keySet()) {
             cmbCategoryName.addItem(name);
         }
 
-        // Llenar el combobox de códigos de categoría
         for (List<String> values : categoryMap.values()) {
-            cmbCategoryCode.addItem(values.get(0)); // Asumiendo que el código está en la primera posición de la lista
+            cmbCategoryCode.addItem(values.get(0));
         }
 
-        // Agregar ActionListener para cmbCategoryName
         cmbCategoryName.addActionListener((ActionEvent e) -> {
             String selectedName = (String) cmbCategoryName.getSelectedItem();
             if (selectedName != null) {
@@ -125,7 +120,6 @@ public final class Sorter extends javax.swing.JDialog {
             }
         });
 
-        // Agregar ActionListener para cmbCategoryCode
         cmbCategoryCode.addActionListener((ActionEvent e) -> {
             String selectedCode = (String) cmbCategoryCode.getSelectedItem();
             if (selectedCode != null) {
@@ -137,6 +131,139 @@ public final class Sorter extends javax.swing.JDialog {
                 }
             }
         });
+    }
+
+    //Fill the comboboxes of categories in the subsubcategories tab
+    private void subsubCategoryCombobox() {
+        categoryMap = subcategory_controller.fillCategoryCombobox();
+        cmbCategoryName1.removeAllItems();
+        cmbCategoryCode1.removeAllItems();
+        cmbCategoryName1.addItem("--Seleccione--");
+        cmbCategoryCode1.addItem("--Seleccione--");
+
+        for (String name : categoryMap.keySet()) {
+            cmbCategoryName1.addItem(name);
+        }
+
+        for (List<String> values : categoryMap.values()) {
+            cmbCategoryCode1.addItem(values.get(0));
+        }
+
+        cmbCategoryName1.addActionListener((ActionEvent e) -> {
+            String selectedName = (String) cmbCategoryName1.getSelectedItem();
+            if (selectedName != null) {
+                List<String> correspondingValues = categoryMap.get(selectedName);
+                if (correspondingValues != null) {
+                    cmbCategoryCode1.setSelectedItem(correspondingValues.get(0));
+                    updateSubcategoryComboboxes();
+                }
+            }
+        });
+
+        cmbCategoryCode1.addActionListener((ActionEvent e) -> {
+            String selectedCode = (String) cmbCategoryCode1.getSelectedItem();
+            if (selectedCode != null) {
+                for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                    if (entry.getValue().get(0).equals(selectedCode)) { // Asumiendo que el código está en la primera posición de la lista
+                        cmbCategoryName1.setSelectedItem(entry.getKey());
+                        updateSubcategoryComboboxes();
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    // Fill the comboboxes of subcategories in the subsubcategories tab based on the selected category
+    private void updateSubcategoryComboboxes() {
+        String selectedName = (String) cmbCategoryName1.getSelectedItem();
+        String selectedCode = (String) cmbCategoryCode1.getSelectedItem();
+        cmbSubCategoryName.removeAllItems();
+        cmbSubCategoryCode.removeAllItems();
+        cmbSubCategoryName.addItem("--Seleccione--");
+        cmbSubCategoryCode.addItem("--Seleccione--");
+
+        String categoryId = null;
+        if (selectedName != null && !selectedName.equals("--Seleccione--")) {
+            categoryId = categoryMap.get(selectedName).get(1); // Assuming ID is at index 1
+        } else if (selectedCode != null && !selectedCode.equals("--Seleccione--")) {
+            for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                if (entry.getValue().get(0).equals(selectedCode)) {
+                    categoryId = entry.getValue().get(1); // Assuming ID is at index 1
+                    break;
+                }
+            }
+        }
+
+        // Load subcategories for the selected category
+        if (categoryId != null) {
+            subcategoryMap = subsubcategory_controller.fillSubcategoryCombobox(Integer.parseInt(categoryId));
+            cmbSubCategoryName.removeAllItems();
+            cmbSubCategoryCode.removeAllItems();
+            cmbSubCategoryName.addItem("--Seleccione--");
+            cmbSubCategoryCode.addItem("--Seleccione--");
+
+            // Fill the subcategory name combobox
+            for (String name : subcategoryMap.keySet()) {
+                cmbSubCategoryName.addItem(name);
+            }
+
+            // Fill the subcategory code combobox
+            for (List<String> values : subcategoryMap.values()) {
+                cmbSubCategoryCode.addItem(values.get(0)); // Assuming code is at index 0
+            }
+
+            // Add ActionListener for cmbSubCategoryName
+            cmbSubCategoryName.addActionListener((ActionEvent e) -> {
+                String selectedSubCategoryName = (String) cmbSubCategoryName.getSelectedItem();
+                if (selectedSubCategoryName != null) {
+                    List<String> correspondingValues = subcategoryMap.get(selectedSubCategoryName);
+                    if (correspondingValues != null) {
+                        cmbSubCategoryCode.setSelectedItem(correspondingValues.get(0));
+                        updateSubsubcategoryComboboxes(); // Update sub-subcategories
+                    }
+                }
+            });
+
+            // Add ActionListener for cmbSubCategoryCode
+            cmbSubCategoryCode.addActionListener((ActionEvent e) -> {
+                String selectedSubCategoryCode = (String) cmbSubCategoryCode.getSelectedItem();
+                if (selectedSubCategoryCode != null) {
+                    for (Map.Entry<String, List<String>> entry : subcategoryMap.entrySet()) {
+                        if (entry.getValue().get(0).equals(selectedSubCategoryCode)) {
+                            cmbSubCategoryName.setSelectedItem(entry.getKey());
+                            updateSubsubcategoryComboboxes(); // Update sub-subcategories
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void updateSubsubcategoryComboboxes() {
+        // Obtener el nombre o código de la subcategoría seleccionada
+        String selectedName = (String) cmbSubCategoryName.getSelectedItem();
+        String selectedCode = (String) cmbSubCategoryCode.getSelectedItem();
+
+        // Obtener el ID de la subcategoría seleccionada
+        String subcategoryId = null;
+        if (selectedName != null && !selectedName.equals("--Seleccione--")) {
+            subcategoryId = subcategoryMap.get(selectedName).get(1); // Asumiendo que el ID está en la segunda posición de la lista
+        } else if (selectedCode != null && !selectedCode.equals("--Seleccione--")) {
+            for (Map.Entry<String, List<String>> entry : subcategoryMap.entrySet()) {
+                if (entry.getValue().get(0).equals(selectedCode)) {
+                    subcategoryId = entry.getValue().get(1); // Asumiendo que el ID está en la segunda posición de la lista
+                    break;
+                }
+            }
+        }
+
+        // Cargar sub-subcategorías para la subcategoría seleccionada
+        if (subcategoryId != null) {
+            DefaultTableModel model = subsubcategory_controller.showSubsubcategories("", stateFilter);
+            tblSubsubcategory.setModel(model);
+        }
     }
 
     private void onTabChange() {
@@ -190,6 +317,37 @@ public final class Sorter extends javax.swing.JDialog {
 
             String selectedName = (String) cmbCategoryName.getSelectedItem();
             String selectedCode = (String) cmbCategoryCode.getSelectedItem();
+            int categoryId = -1; // Valor por defecto en caso de que no se encuentre el ID
+
+            if (selectedName != null && categoryMap.containsKey(selectedName)) {
+                List<String> selectedCategoryValues = categoryMap.get(selectedName);
+                categoryId = selectedCategoryValues != null ? Integer.parseInt(selectedCategoryValues.get(1)) : -1;
+            } else if (selectedCode != null) {
+                for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                    if (entry.getValue().get(0).equals(selectedCode)) {
+                        categoryId = Integer.parseInt(entry.getValue().get(1));
+                        break;
+                    }
+                }
+            }
+
+            subcategory_model.setCodigo(txtSubcategoryCode.getText());
+            subcategory_model.setSubcategorias(txtSubcategoryName.getText());
+            subcategory_model.setDescripcion(txtSubcategoryDescription.getText());
+            subcategory_controller.createSubcategory(subcategory_model, categoryId, idestado);
+
+            showSubcategories("", stateFilter);
+            JOptionPane.showMessageDialog(null, "Subcategoria guardada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Error al guardar la subcategoria", "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        if (tabSelected.equals("subsubcategory") && validateFields()) {
+            estado = "activo";
+            idestado = State_Controller.getEstadoId(estado, Run.model);
+
+            String selectedName = (String) cmbSubCategoryName.getSelectedItem();
+            String selectedCode = (String) cmbSubCategoryCode.getSelectedItem();
             int categoryId = -1; // Valor por defecto en caso de que no se encuentre el ID
 
             if (selectedName != null && categoryMap.containsKey(selectedName)) {
@@ -756,10 +914,15 @@ public final class Sorter extends javax.swing.JDialog {
         jLabel15.setText("Subcategoria:");
 
         cmbSubCategoryCode.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        cmbSubCategoryCode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbSubCategoryCode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Seleccione--" }));
 
         cmbSubCategoryName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        cmbSubCategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbSubCategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Seleccione--" }));
+        cmbSubCategoryName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbSubCategoryNameActionPerformed(evt);
+            }
+        });
 
         chbSubsubCategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         chbSubsubCategoryActive.setText("Activo");
@@ -1108,6 +1271,10 @@ public final class Sorter extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "Ingrese solo 70 caracteres", "Advertencia!", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_txtSubsubcategoryNameKeyTyped
+
+    private void cmbSubCategoryNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSubCategoryNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbSubCategoryNameActionPerformed
 
     private boolean validateFields() {
         if (tabSelected.equals("category")) {

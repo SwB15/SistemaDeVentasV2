@@ -4,6 +4,7 @@ package Controller;
 import Model.Subcategory_Model;
 import Services.Subcategory_Services;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -36,7 +37,7 @@ private final Subcategory_Services subcategory_services = new Subcategory_Servic
         return subcategory_services.showSubcategories(search, stateFilter);
     }
     
-    public HashMap fillCategoryCombobox(){
+    public HashMap<String, List<String>> fillCategoryCombobox(){
         return subcategory_services.fillCategoryCombobox();
     }
 }

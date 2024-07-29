@@ -3,6 +3,7 @@ package Services;
 import Model.Subcategory_Model;
 import Repository.Subcategory_Repository;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -36,7 +37,7 @@ public class Subcategory_Services {
         return subcategory_repository.showSubcategories(search, stateFilter);
     }
     
-    public HashMap fillCategoryCombobox(){
+    public HashMap<String, List<String>> fillCategoryCombobox(){
         return subcategory_repository.fillCategoryCombos();
     }
 }

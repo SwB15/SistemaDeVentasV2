@@ -142,9 +142,9 @@ public class Subcategory_Repository {
         HashMap<String, List<String>> categoryMap = new HashMap<>();
         String sSQL = "SELECT idcategorias, codigo, categorias FROM categorias";
 
-        try (Connection cn = DataSource.getConnection()) {
-            Statement st = cn.createStatement();
-            ResultSet rs = st.executeQuery(sSQL);
+        try (Connection cn = DataSource.getConnection(); 
+                PreparedStatement pst = cn.prepareStatement(sSQL); 
+                ResultSet rs = pst.executeQuery()) {
 
             while (rs.next()) {
                 String id = rs.getString("idcategorias");
@@ -157,10 +157,17 @@ public class Subcategory_Repository {
 
                 categoryMap.put(name, values);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+
+        } catch (SQLException e) {
+            // Mostrar mensaje de error para el usuario
+            JOptionPane.showMessageDialog(null, "Error al obtener las categorías: " + e.getMessage());
+
+            // Registrar el error para el análisis posterior (opcional)
+            Logger.getLogger(Subcategory_Repository.class.getName()).log(Level.SEVERE, "Error en fillCategoryCombos", e);
         }
+
         return categoryMap;
     }
+
 //********************************End of Display Methods********************************
 }
