@@ -51,6 +51,7 @@ Vista\CompraVenta\Ventas$12.class
 View\Products\SeleccionarProductosVentas$2.class
 Utils\Vencimientos.class
 View\Categorias$2.class
+View\Products\Sorter$23.class
 View\Login$10.class
 Vista\Otros\Visualizar.class
 Reportes\Reportes1$10.class
@@ -109,6 +110,7 @@ Vista\CompraVenta\ListaVentas$2.class
 View\Caja\Cuentas$6.class
 Vista\Personas\Clientes$2.class
 View\Categorias$6.class
+View\Products\Sorter$27.class
 Vista\Proveedores\Proveedores$21.class
 Reportes\Reportes$6.class
 Vista\Personas\Usuarios$27.class
@@ -432,6 +434,7 @@ Config\ColorPaletteManager.class
 View\Login$3.class
 Model\DatosDescuentos.class
 Vista\Personas\Clientes$20.class
+View\Products\Sorter$25.class
 View\Products\SeleccionarProductosBaja.class
 Vista\Proveedores\Proveedores$8.class
 Vista\Descuentos\SeleccionarDescuentos.class
@@ -566,6 +569,7 @@ View\Products\Productos2$39.class
 View\Caja\Cuentas$7.class
 View\Products\Productos$17.class
 Vista\Personas\Clientes$1.class
+View\Products\Sorter$26.class
 Config\FrameIconSetter.class
 Model\DatosVentas.class
 Vista\Descuentos\Descuentos$9.class
@@ -580,6 +584,7 @@ View\Products\SeleccionarProductosBaja$1.class
 Vista\Proveedores\Proveedores$6.class
 Controller\FuncionesClientes.class
 View\Products\Baja.class
+View\Products\Sorter$24.class
 View\Caja\DetallesMovimientoCaja$1.class
 Vista\Personas\Usuarios$9.class
 Vista\CompraVenta\Ventas$1.class
@@ -633,6 +638,7 @@ Vista\Descuentos\SeleccionarDescuentos$4.class
 View\Principal$16.class
 Vista\Personas\Clientes$13.class
 View\Caja\MovimientosCaja$2.class
+View\Products\Sorter$21.class
 Vista\Personas\Funcionarios$8.class
 View\Products\Productos$11.class
 Vista\Personas\Funcionarios$1.class
@@ -649,6 +655,7 @@ Vista\CompraVenta\Ventas$9.class
 Vista\Personas\Funcionarios$28.class
 View\Products\Productos$2.class
 View\Products\Productos$10.class
+View\Products\Sorter$22.class
 View\Caja\Cuentas$1.class
 Vista\CompraVenta\Ventas$3.class
 View\Products\Productos$9.class
@@ -670,6 +677,7 @@ Vista\Notificaciones\Fallo$2.class
 View\Principal$10.class
 Vista\Personas\Clientes$10.class
 View\Products\Productos$7.class
+View\Products\Sorter$20.class
 View\Products\Productos$12.class
 Vista\CompraVenta\Ventas$5.class
 Vista\Notificaciones\Notificaciones$2.class

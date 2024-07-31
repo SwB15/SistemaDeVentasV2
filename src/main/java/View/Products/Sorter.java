@@ -32,9 +32,9 @@ public final class Sorter extends javax.swing.JDialog {
     Subcategory_Model subcategory_model = new Subcategory_Model();
     Subsubcategory_Model subsubcategory_model = new Subsubcategory_Model();
 
-    private final String code = "";
-    private String estado = "", stateFilter = "activo", tabSelected = "";
-    private int idestado, category_id, subcategory_id, subsubcategory_id;
+    private String id = "";
+    private String initialState = "", finalState = "", stateFilter = "activo", tabSelected = "category";
+    private int idestado, fk_category, fk_subcategory;
     private HashMap<String, List<String>> categoryMap, subcategoryMap;
 
     public Sorter(java.awt.Frame parent, boolean modal) {
@@ -42,6 +42,7 @@ public final class Sorter extends javax.swing.JDialog {
         initComponents();
         this.setLocationRelativeTo(null);
         jTabbedPane1.setUI(new CustomTabbedPaneUI());
+        pmnuSorter.add(pnlPmnuSorter);
         showCategories("", stateFilter);
         rbtnCategoryActive.setSelected(true);
         jTabbedPane1.addChangeListener((ChangeEvent e) -> {
@@ -52,9 +53,11 @@ public final class Sorter extends javax.swing.JDialog {
             public void actionPerformed(ActionEvent e) {
                 boolean isSelected = chbCategoryActive.isSelected();
                 if (isSelected) {
-                    stateFilter = "activo";
+//                    stateFilter = "activo";
+//                    finalState = "activo";
                 } else {
-                    stateFilter = "inactivo";
+//                    stateFilter = "inactivo";
+//                    finalState = "inactivo";
                 }
             }
         });
@@ -95,10 +98,35 @@ public final class Sorter extends javax.swing.JDialog {
         }
     }
 
-    public void ocultar_columnas(JTable table) {
+    private void ocultar_columnas(JTable table) {
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setPreferredWidth(0);
+    }
+
+    private void cleanTab(String excludeTab) {
+        if (!excludeTab.equals("category")) {
+            txtCategoryName.setText("");
+            txtCategoryCode.setText("");
+            txtCategoryDescription.setText("");
+        }
+        if (!excludeTab.equals("subcategory")) {
+            cmbCategoryCode.setSelectedIndex(0);
+            cmbCategoryName.setSelectedIndex(0);
+            txtSubcategoryName.setText("");
+            txtSubcategoryCode.setText("");
+            txtSubcategoryDescription.setText("");
+        }
+        if (!excludeTab.equals("subsubcategory")) {
+            cmbCategoryCode1.setSelectedIndex(0);
+            cmbCategoryName1.setSelectedIndex(0);
+            cmbSubCategoryCode.setSelectedIndex(0);
+            cmbSubCategoryName.setSelectedIndex(0);
+            txtSubsubcategoryName.setText("");
+            txtSubsubcategoryCode.setText("");
+            txtSubsubcategoryDescription.setText("");
+        }
+        id = "";
     }
 
     //Fill the comboboxes of categories in the subcategories tab
@@ -262,11 +290,6 @@ public final class Sorter extends javax.swing.JDialog {
                 }
             }
         }
-
-        if (subcategoryId != null) {
-            DefaultTableModel model = subsubcategory_controller.showSubsubcategories("", stateFilter);
-            tblSubsubcategory.setModel(model);
-        }
     }
 
     private void onTabChange() {
@@ -277,6 +300,7 @@ public final class Sorter extends javax.swing.JDialog {
                 rbtnCategoryActive.setSelected(true);
                 stateFilter = "activo";
                 tabSelected = "category";
+                cleanTab("category");
                 showCategories("", stateFilter);
                 break;
             case 1:
@@ -284,6 +308,7 @@ public final class Sorter extends javax.swing.JDialog {
                 rbtnSubcategoryActive.setSelected(true);
                 stateFilter = "activo";
                 tabSelected = "subcategory";
+                cleanTab("subcategory");
                 showSubcategories("", stateFilter);
                 break;
             case 2:
@@ -291,6 +316,7 @@ public final class Sorter extends javax.swing.JDialog {
                 rbtnSubsubcategoryActive.setSelected(true);
                 stateFilter = "activo";
                 tabSelected = "subsubcategory";
+                cleanTab("subsubcategory");
                 showSubsubcategories("", stateFilter);
                 break;
         }
@@ -300,8 +326,8 @@ public final class Sorter extends javax.swing.JDialog {
     private void save() {
         if (tabSelected.equals("category")) {
             if (validateFields()) {
-                estado = "activo";
-                idestado = State_Controller.getEstadoId(estado, Run.model);
+                finalState = "activo";
+                idestado = State_Controller.getEstadoId(finalState, Run.model);
 
                 category_model.setCodigo(txtCategoryCode.getText());
                 category_model.setCategorias(txtCategoryName.getText());
@@ -317,8 +343,8 @@ public final class Sorter extends javax.swing.JDialog {
 
         if (tabSelected.equals("subcategory")) {
             if (validateFields()) {
-                estado = "activo";
-                idestado = State_Controller.getEstadoId(estado, Run.model);
+                finalState = "activo";
+                idestado = State_Controller.getEstadoId(finalState, Run.model);
 
                 String selectedName = (String) cmbCategoryName.getSelectedItem();
                 String selectedCode = (String) cmbCategoryCode.getSelectedItem();
@@ -350,8 +376,8 @@ public final class Sorter extends javax.swing.JDialog {
 
         if (tabSelected.equals("subsubcategory")) {
             if (validateFields()) {
-                estado = "activo";
-                idestado = State_Controller.getEstadoId(estado, Run.model);
+                finalState = "activo";
+                idestado = State_Controller.getEstadoId(finalState, Run.model);
 
                 String selectedName = (String) cmbSubCategoryName.getSelectedItem();
                 String selectedCode = (String) cmbSubCategoryCode.getSelectedItem();
@@ -384,35 +410,128 @@ public final class Sorter extends javax.swing.JDialog {
 
     //Updaet the category, subcategory or subsubcategory
     private void update() {
-        if (validateFields()) {
-            estado = "activo";
-            idestado = State_Controller.getEstadoId(estado, Run.model);
+        if (tabSelected.equals("category")) {
+            if (validateFields()) {
+                System.out.println("initial: " + initialState);
+                System.out.println("final: " + finalState);
+                if (initialState.equals("activo") && finalState.equals("inactivo")) {
+                    if (txtCategoryCode.getText().length() == 0) {
+                        JOptionPane.showMessageDialog(null, "Seleccione una categoria para anular.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        int respuesta = JOptionPane.showConfirmDialog(this, "La categoria será desactivada", "Anular categoria?", JOptionPane.YES_NO_OPTION);
+                        if (respuesta == JOptionPane.YES_OPTION) {
+                            idestado = State_Controller.getEstadoId(finalState, Run.model);
 
-            category_model.setIdcategorias(Integer.parseInt(code));
-            category_model.setCodigo(txtCategoryCode.getText());
-            category_model.setCategorias(txtCategoryName.getText());
-            category_model.setDescripcion(txtCategoryDescription.getText());
-            category_controller.updateCategory(category_model, idestado);
+                            System.out.println("categoryId: " + idestado);
 
-            showCategories("", stateFilter);
-            JOptionPane.showMessageDialog(null, "Categoria editada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al editar la categoria", "Error!", JOptionPane.ERROR_MESSAGE);
+//                            category_model.setIdcategorias(Integer.parseInt(id));
+//                            category_controller.disableCategory(category_model, idestado);
+//                            JOptionPane.showMessageDialog(null, "Categoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                } else if (initialState.equals("inactivo") && finalState.equals("activo")) {
+                    if (txtCategoryCode.getText().length() == 0) {
+                        JOptionPane.showMessageDialog(null, "Seleccione una categoria para activar.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        int respuesta = JOptionPane.showConfirmDialog(this, "La categoria será activada", "Activar categoria?", JOptionPane.YES_NO_OPTION);
+                        if (respuesta == JOptionPane.YES_OPTION) {
+                            idestado = State_Controller.getEstadoId(finalState, Run.model);
+
+                            System.out.println("categoryId: " + idestado);
+
+//                            category_model.setIdcategorias(Integer.parseInt(id));
+//                            category_controller.disableCategory(category_model, idestado);
+//                            JOptionPane.showMessageDialog(null, "Categoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                }else{
+                    idestado = State_Controller.getEstadoId(initialState, Run.model);
+                }
+
+//                idestado = State_Controller.getEstadoId(finalState, Run.model);
+                category_model.setIdcategorias(Integer.parseInt(id));
+                category_model.setCodigo(txtCategoryCode.getText());
+                category_model.setCategorias(txtCategoryName.getText());
+                category_model.setDescripcion(txtCategoryDescription.getText());
+                category_controller.updateCategory(category_model, idestado);
+
+                showCategories("", stateFilter);
+                JOptionPane.showMessageDialog(null, "Categoria editada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al editar la categoria", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (tabSelected.equals("subcategory")) {
+            if (validateFields()) {
+//                estado = "activo";
+                idestado = State_Controller.getEstadoId(finalState, Run.model);
+
+                subcategory_model.setIdsubcategorias(Integer.parseInt(id));
+                subcategory_model.setCodigo(txtSubcategoryCode.getText());
+                subcategory_model.setSubcategorias(txtSubcategoryName.getText());
+                subcategory_model.setDescripcion(txtSubcategoryDescription.getText());
+                subcategory_controller.updateSubcategory(subcategory_model, fk_category, idestado);
+
+                showSubcategories("", stateFilter);
+                JOptionPane.showMessageDialog(null, "Subcategoria editada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al editar la Subcategoria", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (tabSelected.equals("subsubcategory")) {
+            if (validateFields()) {
+//                estado = "activo";
+                idestado = State_Controller.getEstadoId(finalState, Run.model);
+
+                subsubcategory_model.setIdsubsubcategorias(Integer.parseInt(id));
+                subsubcategory_model.setCodigo(txtSubsubcategoryCode.getText());
+                subsubcategory_model.setSubsubcategorias(txtSubsubcategoryName.getText());
+                subsubcategory_model.setDescripcion(txtSubsubcategoryDescription.getText());
+                subsubcategory_controller.updateSubsubcategory(subsubcategory_model, fk_subcategory, idestado);
+
+                showSubsubcategories("", stateFilter);
+                JOptionPane.showMessageDialog(null, "Sub-subcategoria editada exitosamente!", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al editar la sub-subcategoria", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
     private void disableCategory() {
-        if (txtCategoryCode.getText().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione una categoria para anular.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
-        } else {
-            int respuesta = JOptionPane.showConfirmDialog(this, "La categoria será desactivada", "Anular categoria?", JOptionPane.YES_NO_OPTION);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                estado = "inactivo";
-                idestado = State_Controller.getEstadoId(estado, Run.model);
+        System.out.println("tab: " + tabSelected);
+        if (tabSelected.equals("category")) {
 
-                category_model.setIdcategorias(Integer.parseInt(code));
-                category_controller.disableCategory(category_model, idestado);
-                JOptionPane.showMessageDialog(null, "Categoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+        }
+        if (tabSelected.equals("subcategory")) {
+            if (txtSubcategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione una subcategoria para anular.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+            } else {
+                int respuesta = JOptionPane.showConfirmDialog(this, "La subcategoria será desactivada", "Anular subcategoria?", JOptionPane.YES_NO_OPTION);
+                if (respuesta == JOptionPane.YES_OPTION) {
+//                    estado = "inactivo";
+                    idestado = State_Controller.getEstadoId(finalState, Run.model);
+
+                    subcategory_model.setIdsubcategorias(Integer.parseInt(id));
+                    subcategory_controller.disableSubcategory(subcategory_model, idestado);
+                    JOptionPane.showMessageDialog(null, "Subcategoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        }
+        if (tabSelected.equals("subsubcategory")) {
+            if (txtSubsubcategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione una sub-subcategoria para anular.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+            } else {
+                int respuesta = JOptionPane.showConfirmDialog(this, "La sub-subcategoria será desactivada", "Anular sub-subcategoria?", JOptionPane.YES_NO_OPTION);
+                if (respuesta == JOptionPane.YES_OPTION) {
+//                    estado = "inactivo";
+                    idestado = State_Controller.getEstadoId(finalState, Run.model);
+
+                    subsubcategory_model.setIdsubsubcategorias(Integer.parseInt(id));
+                    subsubcategory_controller.disableSubsubcategory(subsubcategory_model, idestado);
+                    JOptionPane.showMessageDialog(null, "Sub-subcategoria anulada correctamente.", "Hecho!", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }
@@ -427,6 +546,9 @@ public final class Sorter extends javax.swing.JDialog {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        pmnuSorter = new javax.swing.JPopupMenu();
+        pnlPmnuSorter = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         pnlCategory = new javax.swing.JPanel();
         txtCategoryName = new javax.swing.JTextField();
@@ -493,6 +615,25 @@ public final class Sorter extends javax.swing.JDialog {
         btnNew = new javax.swing.JButton();
         btnAbort = new javax.swing.JButton();
 
+        jLabel2.setText("Anular");
+        jLabel2.setOpaque(true);
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlPmnuSorterLayout = new javax.swing.GroupLayout(pnlPmnuSorter);
+        pnlPmnuSorter.setLayout(pnlPmnuSorterLayout);
+        pnlPmnuSorterLayout.setHorizontalGroup(
+            pnlPmnuSorterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        pnlPmnuSorterLayout.setVerticalGroup(
+            pnlPmnuSorterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Clasificador");
 
@@ -538,6 +679,7 @@ public final class Sorter extends javax.swing.JDialog {
 
             }
         ));
+        tblCategory.setComponentPopupMenu(pmnuSorter);
         tblCategory.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblCategoryMouseClicked(evt);
@@ -606,6 +748,11 @@ public final class Sorter extends javax.swing.JDialog {
 
         chbCategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         chbCategoryActive.setText("Activo");
+        chbCategoryActive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chbCategoryActiveActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlCategoryLayout = new javax.swing.GroupLayout(pnlCategory);
         pnlCategory.setLayout(pnlCategoryLayout);
@@ -710,6 +857,7 @@ public final class Sorter extends javax.swing.JDialog {
 
             }
         ));
+        tblSubcategory.setComponentPopupMenu(pmnuSorter);
         tblSubcategory.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblSubcategoryMouseClicked(evt);
@@ -722,14 +870,29 @@ public final class Sorter extends javax.swing.JDialog {
         buttonGroup1.add(rbtnSubcategoryActive);
         rbtnSubcategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubcategoryActive.setText("Solo activos");
+        rbtnSubcategoryActive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubcategoryActiveActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(rbtnSubcategoryInactive);
         rbtnSubcategoryInactive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubcategoryInactive.setText("Solo inactivos");
+        rbtnSubcategoryInactive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubcategoryInactiveActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(rbtnSubcategoryAll);
         rbtnSubcategoryAll.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubcategoryAll.setText("Todos");
+        rbtnSubcategoryAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubcategoryAllActionPerformed(evt);
+            }
+        });
 
         jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel16.setText("Mostrar en la tabla:");
@@ -879,6 +1042,7 @@ public final class Sorter extends javax.swing.JDialog {
 
             }
         ));
+        tblSubsubcategory.setComponentPopupMenu(pmnuSorter);
         tblSubsubcategory.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblSubsubcategoryMouseClicked(evt);
@@ -891,14 +1055,29 @@ public final class Sorter extends javax.swing.JDialog {
         buttonGroup1.add(rbtnSubsubcategoryActive);
         rbtnSubsubcategoryActive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubsubcategoryActive.setText("Solo activos");
+        rbtnSubsubcategoryActive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubsubcategoryActiveActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(rbtnSubsubcategoryInactive);
         rbtnSubsubcategoryInactive.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubsubcategoryInactive.setText("Solo inactivos");
+        rbtnSubsubcategoryInactive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubsubcategoryInactiveActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(rbtnSubsubcategoryAll);
         rbtnSubsubcategoryAll.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         rbtnSubsubcategoryAll.setText("Todos");
+        rbtnSubsubcategoryAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnSubsubcategoryAllActionPerformed(evt);
+            }
+        });
 
         jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel14.setText("Mostrar en la tabla:");
@@ -1075,7 +1254,7 @@ public final class Sorter extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        if (code.equals("")) {
+        if (id.equals("")) {
             save();
         } else {
             update();
@@ -1296,51 +1475,113 @@ public final class Sorter extends javax.swing.JDialog {
 
     private void tblCategoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCategoryMouseClicked
         int select = tblCategory.rowAtPoint(evt.getPoint());
+        tblCategory.setRowSelectionInterval(select, select);
 
-        category_id = Integer.parseInt(tblCategory.getValueAt(select, 0).toString());
+        id = tblCategory.getValueAt(select, 0).toString();
         txtCategoryCode.setText(String.valueOf(tblCategory.getValueAt(select, 1)));
         txtCategoryName.setText(String.valueOf(tblCategory.getValueAt(select, 2)));
         txtCategoryDescription.setText(String.valueOf(tblCategory.getValueAt(select, 3)));
 
         if (String.valueOf(tblCategory.getValueAt(select, 4)).equals("activo")) {
             chbCategoryActive.setSelected(true);
+            initialState = tblCategory.getValueAt(select, 4).toString();
         } else {
             chbCategoryActive.setSelected(false);
+            initialState = tblCategory.getValueAt(select, 4).toString();
         }
+
+        showCategories("", stateFilter);
     }//GEN-LAST:event_tblCategoryMouseClicked
 
     private void tblSubcategoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSubcategoryMouseClicked
         int select = tblSubcategory.rowAtPoint(evt.getPoint());
+        tblSubcategory.setRowSelectionInterval(select, select);
 
-        subcategory_id = Integer.parseInt(tblSubcategory.getValueAt(select, 0).toString());
+        id = tblSubcategory.getValueAt(select, 0).toString();
         txtSubcategoryCode.setText(String.valueOf(tblSubcategory.getValueAt(select, 1)));
         txtSubcategoryName.setText(String.valueOf(tblSubcategory.getValueAt(select, 2)));
         txtSubcategoryDescription.setText(String.valueOf(tblSubcategory.getValueAt(select, 3)));
-        cmbCategoryName.setSelectedItem(String.valueOf(tblSubcategory.getValueAt(select, 4)));
+        fk_category = Integer.parseInt(tblSubcategory.getValueAt(select, 4).toString());
+        cmbCategoryName.setSelectedItem(String.valueOf(tblSubcategory.getValueAt(select, 5)));
 
-        if (String.valueOf(tblSubcategory.getValueAt(select, 5)).equals("activo")) {
+        if (String.valueOf(tblSubcategory.getValueAt(select, 6)).equals("activo")) {
             chbSubcategoryActive.setSelected(true);
+            initialState = tblSubcategory.getValueAt(select, 6).toString();
         } else {
             chbSubcategoryActive.setSelected(false);
+            initialState = tblSubcategory.getValueAt(select, 6).toString();
         }
+
+        showSubcategories("", stateFilter);
     }//GEN-LAST:event_tblSubcategoryMouseClicked
 
     private void tblSubsubcategoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSubsubcategoryMouseClicked
         int select = tblSubsubcategory.rowAtPoint(evt.getPoint());
+        tblSubsubcategory.setRowSelectionInterval(select, select);
 
-        subsubcategory_id = Integer.parseInt(tblSubsubcategory.getValueAt(select, 0).toString());
+        id = tblSubsubcategory.getValueAt(select, 0).toString();
         txtSubsubcategoryCode.setText(String.valueOf(tblSubsubcategory.getValueAt(select, 1)));
         txtSubsubcategoryName.setText(String.valueOf(tblSubsubcategory.getValueAt(select, 2)));
         txtSubsubcategoryDescription.setText(String.valueOf(tblSubsubcategory.getValueAt(select, 3)));
-        cmbCategoryName1.setSelectedItem(String.valueOf(tblSubsubcategory.getValueAt(select, 5)));
-        cmbSubCategoryName.setSelectedItem(String.valueOf(tblSubsubcategory.getValueAt(select, 4)));
+        fk_subcategory = Integer.parseInt(tblSubsubcategory.getValueAt(select, 4).toString());
+        cmbCategoryName1.setSelectedItem(String.valueOf(tblSubsubcategory.getValueAt(select, 6)));
+        cmbSubCategoryName.setSelectedItem(String.valueOf(tblSubsubcategory.getValueAt(select, 5)));
 
-        if (String.valueOf(tblSubsubcategory.getValueAt(select, 6)).equals("activo")) {
+        if (String.valueOf(tblSubsubcategory.getValueAt(select, 7)).equals("activo")) {
             chbSubsubCategoryActive.setSelected(true);
+            initialState = tblSubsubcategory.getValueAt(select, 7).toString();
         } else {
             chbSubsubCategoryActive.setSelected(false);
+            initialState = tblSubsubcategory.getValueAt(select, 7).toString();
         }
+
+        showSubsubcategories("", stateFilter);
     }//GEN-LAST:event_tblSubsubcategoryMouseClicked
+
+    private void rbtnSubcategoryActiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubcategoryActiveActionPerformed
+        stateFilter = "activo";
+        showSubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubcategoryActiveActionPerformed
+
+    private void rbtnSubcategoryInactiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubcategoryInactiveActionPerformed
+        stateFilter = "inactivo";
+        showSubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubcategoryInactiveActionPerformed
+
+    private void rbtnSubcategoryAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubcategoryAllActionPerformed
+        stateFilter = "todos";
+        showSubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubcategoryAllActionPerformed
+
+    private void rbtnSubsubcategoryActiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubsubcategoryActiveActionPerformed
+        stateFilter = "activo";
+        showSubsubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubsubcategoryActiveActionPerformed
+
+    private void rbtnSubsubcategoryInactiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubsubcategoryInactiveActionPerformed
+        stateFilter = "inactivo";
+        showSubsubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubsubcategoryInactiveActionPerformed
+
+    private void rbtnSubsubcategoryAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSubsubcategoryAllActionPerformed
+        stateFilter = "todos";
+        showSubsubcategories("", stateFilter);
+    }//GEN-LAST:event_rbtnSubsubcategoryAllActionPerformed
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        disableCategory();
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void chbCategoryActiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbCategoryActiveActionPerformed
+        if (chbCategoryActive.isSelected()) {
+//            stateFilter = "activo";
+            finalState = "activo";
+        }
+        if (!chbCategoryActive.isSelected()) {
+//            stateFilter = "activo";
+            finalState = "inactivo";
+        }
+    }//GEN-LAST:event_chbCategoryActiveActionPerformed
 
     private boolean validateFields() {
         if (tabSelected.equals("category")) {
@@ -1418,6 +1659,7 @@ public final class Sorter extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1437,8 +1679,10 @@ public final class Sorter extends javax.swing.JDialog {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPopupMenu pmnuSorter;
     private javax.swing.JPanel pnlCategory;
     private javax.swing.JPanel pnlCategoryRadiobuttons;
+    private javax.swing.JPanel pnlPmnuSorter;
     private javax.swing.JPanel pnlSubcategory;
     private javax.swing.JPanel pnlSubsubcategory;
     private javax.swing.JRadioButton rbtnCategoryActive;

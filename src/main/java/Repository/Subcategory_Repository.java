@@ -82,9 +82,9 @@ public class Subcategory_Repository {
 
         try (Connection cn = DataSource.getConnection()) {
             pst = cn.prepareStatement(sql);
-            pst.setInt(1, model.getIdsubcategorias());
-            pst.setInt(2, foreignKey);
-
+            pst.setInt(1, foreignKey);
+            pst.setInt(2, model.getIdsubcategorias());
+            
             int N = pst.executeUpdate();
             return N != 0;
         } catch (SQLException ex) {
@@ -97,12 +97,12 @@ public class Subcategory_Repository {
 //********************************Begin of Display Methods********************************
     public DefaultTableModel showSubcategories(String search, String stateFilter) {
         DefaultTableModel model;
-        String[] titles = {"Id","Codigo", "Subcategoría", "Descripción", "Categoría", "Estado"};
-        String[] records = new String[6];
+        String[] titles = {"Id","Codigo", "Subcategoría", "Descripción", "Idcategorias","Categoría", "Estado"};
+        String[] records = new String[7];
         int totalRecords = 0;
         model = new DefaultTableModel(null, titles);
 
-        String sSQL = "SELECT s.idsubcategorias, s.codigo, s.subcategorias, s.descripcion, c.categorias, e.estados "
+        String sSQL = "SELECT s.idsubcategorias, s.codigo, s.subcategorias, s.descripcion, c.idcategorias,c.categorias, e.estados "
                 + "FROM subcategorias s "
                 + "JOIN categorias c ON s.fk_categorias = c.idcategorias "
                 + "JOIN estados e ON s.fk_estados = e.idestados "
@@ -126,8 +126,9 @@ public class Subcategory_Repository {
                 records[1] = rs.getString("codigo");
                 records[2] = rs.getString("subcategorias");
                 records[3] = rs.getString("descripcion");
-                records[4] = rs.getString("categorias");
-                records[5] = rs.getString("estados");
+                records[4] = rs.getString("idcategorias");
+                records[5] = rs.getString("categorias");
+                records[6] = rs.getString("estados");
 
                 totalRecords++;
                 model.addRow(records);

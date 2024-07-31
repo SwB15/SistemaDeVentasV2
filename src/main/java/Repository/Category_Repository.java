@@ -77,9 +77,9 @@ public class Category_Repository {
 
         try (Connection cn = DataSource.getConnection()) {
             pst = cn.prepareStatement(sql);
-            pst.setInt(1, model.getIdcategorias());
-            pst.setInt(2, foreignKey);
-
+            pst.setInt(1, foreignKey);
+            pst.setInt(2, model.getIdcategorias());
+            
             int N = pst.executeUpdate();
             return N != 0;
         } catch (SQLException ex) {
