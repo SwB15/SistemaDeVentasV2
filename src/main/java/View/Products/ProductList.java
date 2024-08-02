@@ -32,7 +32,7 @@ public class ProductList extends javax.swing.JDialog {
             public void mousePressed(MouseEvent e) {
                 int tabIndex = jTabbedPane1.getSelectedIndex();
                 if (tabIndex == 1) {
-                    AddProduct dialog = new AddProduct(f, true);
+                    ProductProperties dialog = new ProductProperties(f, true);
                     iconSetter.setIcon(dialog);
                     dialog.setVisible(true);
                 }

@@ -5,7 +5,7 @@ import View.Caja.CierreCaja;
 import Reportes.Reportes;
 import Config.FrameIconSetter;
 import View.Caja.MovimientosCaja;
-import View.Products.AddProduct;
+import View.Products.ProductProperties;
 import Vista.CompraVenta.Compras;
 import Vista.CompraVenta.ListaCompras;
 import Vista.CompraVenta.ListaVentas;
@@ -511,7 +511,7 @@ public final class Principal extends javax.swing.JFrame {
 //        this.setLocationRelativeTo(null);
 //        this.setExtendedState(MAXIMIZED_BOTH);
 
-        AddProduct dialog = new AddProduct(f, true);
+        ProductProperties dialog = new ProductProperties(f, true);
         iconSetter.setIcon(dialog);
         dialog.setVisible(true);
 
@@ -1023,7 +1023,7 @@ public final class Principal extends javax.swing.JFrame {
 //        this.setLocationRelativeTo(null);
 //        this.setExtendedState(MAXIMIZED_BOTH);
 
-        AddProduct dialog = new AddProduct(f, true);
+        ProductProperties dialog = new ProductProperties(f, true);
         iconSetter.setIcon(dialog);
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed

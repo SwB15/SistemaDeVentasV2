@@ -10,8 +10,10 @@ public class Product_Model {
 
     private int idproductos;
     private String codigo;
+    private String codigointerno;
     private String nombre;
     private int precio;
+    private int stockminimo;
     private String presentacion;
     private String descripcion;
     private Date fechavencimiento;
@@ -19,11 +21,13 @@ public class Product_Model {
     private int fk_subcategorias;
     private int fk_estados;
 
-    public Product_Model(int idproductos, String codigo, String nombre, int precio, String presentacion, String descripcion, Date fechavencimiento, int iva, int fk_subcategorias, int fk_estados) {
+    public Product_Model(int idproductos, String codigo, String codigointerno, String nombre, int precio, int stockminimo, String presentacion, String descripcion, Date fechavencimiento, int iva, int fk_subcategorias, int fk_estados) {
         this.idproductos = idproductos;
         this.codigo = codigo;
+        this.codigointerno = codigointerno;
         this.nombre = nombre;
         this.precio = precio;
+        this.stockminimo = stockminimo;
         this.presentacion = presentacion;
         this.descripcion = descripcion;
         this.fechavencimiento = fechavencimiento;
@@ -50,7 +54,15 @@ public class Product_Model {
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
-    
+
+    public String getCodigointerno() {
+        return codigointerno;
+    }
+
+    public void setCodigointerno(String codigointerno) {
+        this.codigointerno = codigointerno;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -65,6 +77,14 @@ public class Product_Model {
 
     public void setPrecio(int precio) {
         this.precio = precio;
+    }
+
+    public int getStockminimo() {
+        return stockminimo;
+    }
+
+    public void setStockminimo(int stockminimo) {
+        this.stockminimo = stockminimo;
     }
 
     public String getPresentacion() {

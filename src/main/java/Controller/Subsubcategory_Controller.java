@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
 public class Subsubcategory_Controller {
 
     private final Subsubcategory_Services subsubcategory_services = new Subsubcategory_Services();
-    Subsubcategory_Model model = new Subsubcategory_Model();
+    private final Subsubcategory_Model model = new Subsubcategory_Model();
 
     public Subsubcategory_Controller() {
     }

@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableModel;
 public class Category_Controller {
 
     private final Category_Services category_Services = new Category_Services();
-    Category_Model model = new Category_Model();
+    private final Category_Model model = new Category_Model();
 
     public Category_Controller() {
     }

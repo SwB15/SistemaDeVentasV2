@@ -14,6 +14,7 @@ Vista\CompraVenta\Vuelto$4.class
 Vista\Personas\Usuarios$23.class
 View\Principal3$10.class
 View\Products\Productos$40.class
+Model\Product_Model.class
 Controller\Subcategory_Controller.class
 Vista\CompraVenta\ListaCompras$6.class
 Vista\Proveedores\Proveedores$5.class
@@ -101,7 +102,6 @@ Vista\Personas\Usuarios$19.class
 Vista\CompraVenta\Compras$3.class
 View\Caja\MovimientosCaja1.class
 Vista\Descuentos\Descuentos$8.class
-View\Products\AddProduct$1$1.class
 Vista\CompraVenta\Compras$9.class
 Utils\ControlCantidad.class
 Reports\ProductReports$1.class
@@ -153,7 +153,6 @@ Vista\Personas\Usuarios$30.class
 Vista\Proveedores\Proveedores$18.class
 View\Categorias$7.class
 Vista\Personas\Funcionarios$12.class
-View\Products\AddProduct$1.class
 Reportes\Reportes$2.class
 View\Products\Productos$41.class
 View\Products\Productos2$34.class
@@ -209,6 +208,7 @@ Vista\CompraVenta\Ventas1$7.class
 Vista\Otros\CodeBar$2.class
 Vista\Personas\Clientes$24.class
 Fuentes\Fuentes.class
+Repository\Product_Repository.class
 Vista\Notificaciones\Advertencia.class
 Vista\Otros\Auditoria.class
 Controller\FuncionesUsuarios.class
@@ -338,6 +338,7 @@ Vista\Otros\Departamentos$7.class
 Utils\Control$1.class
 Vista\Otros\Ciudades$11.class
 View\Products\Baja$6.class
+Controller\Product_Controller.class
 View\Principal3$7.class
 Vista\Otros\Ciudades$3.class
 View\Products\ListaProductos$1.class
@@ -402,6 +403,7 @@ Vista\Personas\Funcionarios$30.class
 View\Principal3$21.class
 View\Products\Productos2$19.class
 Vista\Personas\Usuarios$12.class
+Services\Product_Services.class
 View\Caja\MovimientosCaja.class
 View\Products\ProductDisposals.class
 View\Products\SelectProductDisposals$4.class
