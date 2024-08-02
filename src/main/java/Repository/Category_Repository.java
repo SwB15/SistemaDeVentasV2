@@ -19,7 +19,7 @@ public class Category_Repository {
 
     String sql = "";
     PreparedStatement pst;
-    
+
 //********************************Begin of Insert, Update, Delete, Disable********************************
     public boolean insert(Category_Model model, int idestado) {
         sql = "INSERT INTO categorias (codigo, categorias, descripcion, fk_estados) VALUES (?,?,?,?)";
@@ -71,22 +71,6 @@ public class Category_Repository {
             return false;
         }
     }
-
-    public boolean disable(Category_Model model, int foreignKey) {
-        sql = "UPDATE categorias SET fk_estados = ? WHERE idcategorias = ?";
-
-        try (Connection cn = DataSource.getConnection()) {
-            pst = cn.prepareStatement(sql);
-            pst.setInt(1, foreignKey);
-            pst.setInt(2, model.getIdcategorias());
-            
-            int N = pst.executeUpdate();
-            return N != 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(Subcategory_Repository.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
 //******************************** End of Insert, Update, Delete, Disable ********************************
 
 //********************************Begin of Display Methods********************************
@@ -98,9 +82,9 @@ public class Category_Repository {
         model = new DefaultTableModel(null, titles);
 
         String sSQL = "SELECT c.idcategorias, c.codigo, c.categorias, c.descripcion, e.estados "
-                    + "FROM categorias c "
-                    + "JOIN estados e ON c.fk_estados = e.idestados "
-                    + "WHERE c.categorias LIKE ?";
+                + "FROM categorias c "
+                + "JOIN estados e ON c.fk_estados = e.idestados "
+                + "WHERE c.categorias LIKE ?";
 
         if (stateFilter.equals("activo")) {
             sSQL += " AND e.estados = 'activo'";
@@ -110,8 +94,7 @@ public class Category_Repository {
 
         sSQL += " ORDER BY c.codigo DESC";
 
-        try (Connection cn = DataSource.getConnection();
-             PreparedStatement pst = cn.prepareStatement(sSQL)) { //Don't touch!
+        try (Connection cn = DataSource.getConnection(); PreparedStatement pst = cn.prepareStatement(sSQL)) { //Don't touch!
             pst.setString(1, "%" + search + "%");
 
             ResultSet rs = pst.executeQuery();
@@ -122,7 +105,7 @@ public class Category_Repository {
                 records[2] = rs.getString("categorias");
                 records[3] = rs.getString("descripcion");
                 records[4] = rs.getString("estados");
-                
+
                 totalRecords++;
                 model.addRow(records);
             }

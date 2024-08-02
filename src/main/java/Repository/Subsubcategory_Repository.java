@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,22 +72,6 @@ public class Subsubcategory_Repository {
             return N != 0;
         } catch (SQLException ex) {
             Logger.getLogger(Subsubcategory_Repository.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
-
-    public boolean disable(Subsubcategory_Model model, int foreignKey) {
-        sql = "UPDATE subsubcategorias SET fk_estados = ? WHERE idsubsubcategorias = ?";
-
-        try (Connection cn = DataSource.getConnection()) {
-            pst = cn.prepareStatement(sql);
-            pst.setInt(1, model.getIdsubsubcategorias());
-            pst.setInt(2, foreignKey);
-
-            int N = pst.executeUpdate();
-            return N != 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(Subcategory_Repository.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }

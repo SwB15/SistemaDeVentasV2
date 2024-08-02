@@ -27,10 +27,6 @@ public class Category_Services {
         return category_repository.delete(model);
     }
     
-    public boolean disableCategory(Category_Model model, int foreignKey) {
-        return category_repository.disable(model, foreignKey);
-    }
-    
     public DefaultTableModel showCategories(String search, String stateFilter){
         return category_repository.showCategories(search, stateFilter);
     }

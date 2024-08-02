@@ -29,10 +29,6 @@ public class Subsubcategory_Services {
         return subsubcategory_repository.delete(model);
     }
 
-    public boolean disableSubsubcategory(Subsubcategory_Model model, int foreignKey) {
-        return subsubcategory_repository.disable(model, foreignKey);
-    }
-
     public DefaultTableModel showSubsubcategories(String search, String stateFilter) {
         return subsubcategory_repository.showSubsubcategories(search, stateFilter);
     }

@@ -13,31 +13,36 @@ import javax.swing.table.DefaultTableModel;
 public class Subsubcategory_Controller {
 
     private final Subsubcategory_Services subsubcategory_services = new Subsubcategory_Services();
+    Subsubcategory_Model model = new Subsubcategory_Model();
 
     public Subsubcategory_Controller() {
     }
 
-    public boolean createSubsubcategory(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+    public boolean createSubsubcategory(String code, String subsubcategory, String description, int foreignKey, int foreignKey2) {
+        model.setCodigo(code);
+        model.setSubsubcategorias(subsubcategory);
+        model.setDescripcion(description);
         return subsubcategory_services.addSubsubcategory(model, foreignKey, foreignKey2);
     }
 
-    public boolean updateSubsubcategory(Subsubcategory_Model model, int foreignKey, int foreignKey2) {
+    public boolean updateSubsubcategory(int id, String code, String subsubcategory, String description, int foreignKey, int foreignKey2) {
+        model.setIdsubsubcategorias(id);
+        model.setCodigo(code);
+        model.setSubsubcategorias(subsubcategory);
+        model.setDescripcion(description);
         return subsubcategory_services.updateSubsubcategory(model, foreignKey, foreignKey2);
     }
 
-    public boolean deleteSubsubcategory(Subsubcategory_Model model) {
+    public boolean deleteSubsubcategory(int id) {
+        model.setIdsubsubcategorias(id);
         return subsubcategory_services.deleteSubsubcategory(model);
-    }
-
-    public boolean disableSubsubcategory(Subsubcategory_Model model, int foreignKey) {
-        return subsubcategory_services.disableSubsubcategory(model, foreignKey);
     }
 
     public DefaultTableModel showSubsubcategories(String search, String stateFilter) {
         return subsubcategory_services.showSubsubcategories(search, stateFilter);
     }
-    
-    public HashMap<String, List<String>> fillSubcategoryCombobox(int foreignKey){
+
+    public HashMap<String, List<String>> fillSubcategoryCombobox(int foreignKey) {
         return subsubcategory_services.fillSubcategoryCombobox(foreignKey);
     }
 }

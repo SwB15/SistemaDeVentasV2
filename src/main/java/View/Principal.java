@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import Vista.Otros.CodeBar;
 import Vista.Personas.Funcionarios;
 import View.Products.Baja;
+import View.Products.ProductDisposals;
 import View.Products.ProductList;
 import View.Products.Sorter;
 import Vista.Proveedores.Proveedores;
@@ -855,21 +856,10 @@ public final class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_smnuReportesActionPerformed
 
     private void smnuBajaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_smnuBajaActionPerformed
-        Baja form = new Baja();
-        jDesktopPane1.add(form);
+        ProductDisposals dialog = new ProductDisposals(f, true);
+        iconSetter.setIcon(dialog);
+        dialog.setVisible(true);
 
-        form.setClosable(true);
-        form.setIconifiable(true);
-        try {
-            Dimension desktopSize = jDesktopPane1.getSize();
-            Dimension FrameSize = form.getSize();
-            form.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
-            form.show();
-        } catch (Exception e) {
-        }
-
-        form.toFront();
-        form.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
     }//GEN-LAST:event_smnuBajaActionPerformed

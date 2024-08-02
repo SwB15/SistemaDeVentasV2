@@ -1,5 +1,12 @@
-
 package View.Products;
+
+import Controller.Product_Controller;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -7,10 +14,40 @@ package View.Products;
  */
 public class AddProduct extends javax.swing.JDialog {
 
+    Product_Controller product_controller = new Product_Controller();
+    private HashMap<String, List<String>> categoryMap, subcategoryMap;
+
     public AddProduct(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
+    }
+
+    public void fillComboboxes(JComboBox<String> categoryCode, JComboBox<String> categoryName, JComboBox<String> subcategoryName, JComboBox<String> subcategoryComboBox) {
+        HashMap<String, HashMap<String, List<String>>> categoryMap = product_controller.fillComboboxes();
+
+        for (String categoryNames : categoryMap.keySet()) {
+            categoryName.addItem(categoryNames);
+        }
+
+        for (String categoryCodes : categoryMap.keySet()) {
+            categoryCode.addItem(categoryCodes);
+        }
+
+        // Acción al seleccionar una categoría
+        categoryComboBox.addActionListener(e -> {
+            String selectedCategory = (String) categoryComboBox.getSelectedItem();
+            subcategoryComboBox.removeAllItems();
+
+            if (selectedCategory != null) {
+                HashMap<String, List<String>> subcategoryMap = categoryMap.get(selectedCategory);
+                for (Map.Entry<String, List<String>> subcategoryEntry : subcategoryMap.entrySet()) {
+                    if (!"categoryValues".equals(subcategoryEntry.getKey())) {
+                        subcategoryComboBox.addItem(subcategoryEntry.getKey());
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -28,8 +65,8 @@ public class AddProduct extends javax.swing.JDialog {
         cmbCategoryCode = new javax.swing.JComboBox<>();
         cmbCategoryName = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        cmbSubcategoryCode = new javax.swing.JComboBox<>();
-        cmbSubcategoryName = new javax.swing.JComboBox<>();
+        cmbSubCategoryCode = new javax.swing.JComboBox<>();
+        cmbSubCategoryName = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
@@ -65,9 +102,9 @@ public class AddProduct extends javax.swing.JDialog {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Subcategoria:");
 
-        cmbSubcategoryCode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbSubCategoryCode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        cmbSubcategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbSubCategoryName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel3.setText("Nombre:");
@@ -199,9 +236,9 @@ public class AddProduct extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbCategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cmbSubcategoryCode, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmbSubCategoryCode, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbSubcategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(cmbSubCategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -215,8 +252,8 @@ public class AddProduct extends javax.swing.JDialog {
                     .addComponent(cmbCategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbSubcategoryCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbSubcategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbSubCategoryCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbSubCategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -258,49 +295,53 @@ public class AddProduct extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    private boolean validateFields() {
+        if (tabSelected.equals("category")) {
+            if (txtCategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddProduct.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddProduct.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddProduct.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddProduct.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AddProduct dialog = new AddProduct(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
+            if (txtCategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Categoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
             }
-        });
+        }
+
+        if (tabSelected.equals("subcategory")) {
+            if (cmbCategoryName.getSelectedItem() == "--Seleccione--" || cmbCategoryName.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(null, "Seleccione una categoria del combobox", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtSubcategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtSubcategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+        }
+
+        if (tabSelected.equals("subsubcategory")) {
+            if (cmbSubCategoryName.getSelectedItem() == "--Seleccione--" || cmbSubCategoryName.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(null, "Seleccione una subcategoria del combobox", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtSubsubcategoryCode.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el código de la Sub-subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            if (txtSubsubcategoryName.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Ingrese el nombre de la Sub-subcategoria.", "Advertencia!", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+        }
+        return true;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -310,8 +351,8 @@ public class AddProduct extends javax.swing.JDialog {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cmbCategoryCode;
     private javax.swing.JComboBox<String> cmbCategoryName;
-    private javax.swing.JComboBox<String> cmbSubcategoryCode;
-    private javax.swing.JComboBox<String> cmbSubcategoryName;
+    private javax.swing.JComboBox<String> cmbSubCategoryCode;
+    private javax.swing.JComboBox<String> cmbSubCategoryName;
     private javax.swing.JComboBox<String> cmbUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

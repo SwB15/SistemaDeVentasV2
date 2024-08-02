@@ -11,24 +11,29 @@ import javax.swing.table.DefaultTableModel;
 public class Category_Controller {
 
     private final Category_Services category_Services = new Category_Services();
+    Category_Model model = new Category_Model();
 
     public Category_Controller() {
     }
 
-    public boolean createCategory(Category_Model model, int foreignKey) {
+    public boolean createCategory(String code, String category, String description, int foreignKey) {
+        model.setCodigo(code);
+        model.setCategorias(category);
+        model.setDescripcion(description);
         return category_Services.addCategory(model, foreignKey);
     }
 
-    public boolean updateCategory(Category_Model model, int foreignKey) {
+    public boolean updateCategory(int id, String code, String category, String description, int foreignKey) {
+        model.setIdcategorias(id);
+        model.setCodigo(code);
+        model.setCategorias(category);
+        model.setDescripcion(description);
         return category_Services.updateCategory(model, foreignKey);
     }
 
-    public boolean deleteCategory(Category_Model model) {
+    public boolean deleteCategory(int id) {
+        model.setIdcategorias(id);
         return category_Services.deleteCategory(model);
-    }
-
-    public boolean disableCategory(Category_Model model, int foreignKey) {
-        return category_Services.disableCategory(model, foreignKey);
     }
 
     public DefaultTableModel showCategories(String search, String stateFilter) {

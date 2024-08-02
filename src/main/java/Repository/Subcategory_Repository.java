@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,28 +75,12 @@ public class Subcategory_Repository {
             return false;
         }
     }
-
-    public boolean disable(Subcategory_Model model, int foreignKey) {
-        sql = "UPDATE subcategorias SET fk_estados = ? WHERE idsubcategorias = ?";
-
-        try (Connection cn = DataSource.getConnection()) {
-            pst = cn.prepareStatement(sql);
-            pst.setInt(1, foreignKey);
-            pst.setInt(2, model.getIdsubcategorias());
-            
-            int N = pst.executeUpdate();
-            return N != 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(Subcategory_Repository.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
 //******************************** End of Insert, Update, Delete, Disable ********************************
 
 //********************************Begin of Display Methods********************************
     public DefaultTableModel showSubcategories(String search, String stateFilter) {
         DefaultTableModel model;
-        String[] titles = {"Id","Codigo", "Subcategoría", "Descripción", "Idcategorias","Categoría", "Estado"};
+        String[] titles = {"Id", "Codigo", "Subcategoría", "Descripción", "Idcategorias", "Categoría", "Estado"};
         String[] records = new String[7];
         int totalRecords = 0;
         model = new DefaultTableModel(null, titles);
@@ -144,9 +127,7 @@ public class Subcategory_Repository {
         HashMap<String, List<String>> categoryMap = new HashMap<>();
         String sSQL = "SELECT idcategorias, codigo, categorias FROM categorias";
 
-        try (Connection cn = DataSource.getConnection(); 
-                PreparedStatement pst = cn.prepareStatement(sSQL); 
-                ResultSet rs = pst.executeQuery()) {
+        try (Connection cn = DataSource.getConnection(); PreparedStatement pst = cn.prepareStatement(sSQL); ResultSet rs = pst.executeQuery()) {
 
             while (rs.next()) {
                 String id = rs.getString("idcategorias");
@@ -167,9 +148,7 @@ public class Subcategory_Repository {
             // Registrar el error para el análisis posterior (opcional)
             Logger.getLogger(Subcategory_Repository.class.getName()).log(Level.SEVERE, "Error en fillCategoryCombos", e);
         }
-
         return categoryMap;
     }
-
 //********************************End of Display Methods********************************
 }
